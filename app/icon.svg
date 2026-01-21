@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <style>
+      .icon-base { 
+        stroke: #F59E0B; /* 金黄色 */
+        stroke-linecap: round; 
+        stroke-linejoin: round; 
+      }
+    </style>
+
+    <mask id="beer-mask">
+      <rect width="24" height="24" fill="white" />
+      
+      <g transform="translate(4.5, 4) scale(0.8)">
+        <path d="M13 12 c0 -1.5 2.5 -1.5 2.5 -0.5 c 0.5 -1 2.5 -1 3 0 c 0.5 -1 2.5 -1 2.5 0.5 Z" fill="black" stroke="black" stroke-width="2" stroke-linejoin="round" />
+        <path d="M13 12 v6 a2 2 0 0 0 2 2 h4 a2 2 0 0 0 2 -2 v-6 Z" fill="black" stroke="black" stroke-width="2" />
+        <path d="M21 14 h1 a1.5 1.5 0 0 1 0 3 h-1" fill="none" stroke="black" stroke-width="2" />
+      </g>
+    </mask>
+  </defs>
+
+  <path d="M3 19 H21 L17 8 L13 12 L9 5 L3 19 Z" class="icon-base" stroke-width="2" mask="url(#beer-mask)" />
+
+  <g transform="translate(4.5, 4) scale(0.8)">
+      <path d="M13 12 c0 -1.5 2.5 -1.5 2.5 -0.5 c 0.5 -1 2.5 -1 3 0 c 0.5 -1 2.5 -1 2.5 0.5" class="icon-base" stroke-width="2" />
+      <path d="M13 12 v6 a2 2 0 0 0 2 2 h4 a2 2 0 0 0 2 -2 v-6" class="icon-base" stroke-width="2" />
+      <path d="M21 14 h1 a1.5 1.5 0 0 1 0 3 h-1" class="icon-base" stroke-width="2" />
+
+      <g stroke-width="1.5">
+        <path d="M16 14 v3" class="icon-base" />
+        <path d="M18 14 v3" class="icon-base" />
+      </g>
+  </g>
+</svg>
