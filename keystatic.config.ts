@@ -2,12 +2,7 @@ import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   // 🟢 智能存储模式：本地开发用 local，上线后用 github
-  storage: process.env.NODE_ENV === 'development' 
-    ? { kind: 'local' } 
-    : { 
-        kind: 'github', 
-        repo: 'Cloudplume718/titan-brewing', // ⚠️ 这里记得改成你真实的 GitHub 仓库地址 (用户名/仓库名)
-      },
+storage: { kind: 'local' },
 
   // ☁️ 云端配置 (保持不变)
   cloud: {
