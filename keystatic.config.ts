@@ -1,17 +1,18 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  // 🟢 智能模式：本地开发用 local，线上用 github
-  storage: process.env.NODE_ENV === 'development'
-    ? { kind: 'local' }
-    : {
+  // 🟢 标准逻辑：生产环境用 GitHub，开发环境用 Local
+  storage: process.env.NODE_ENV === 'production'
+    ? {
         kind: 'github',
-        // 🔴 务必确认这里是你的 "用户名/仓库名"
         repo: 'Cloudplume718/titan-brewing', 
+      }
+    : {
+        kind: 'local',
       },
       
   collections: {
-    // 📦 第一板块：设备库存
+    // 📦 设备库存
     products: collection({
       label: '设备库存',
       slugField: 'name',
@@ -20,7 +21,7 @@ export default config({
       schema: {
         name: fields.slug({ name: { label: '设备名称' } }),
         price: fields.number({ 
-            label: '价格 (填0或空则显示面议)',
+            label: '价格',
             validation: { min: 0 }
         }),
         category: fields.select({
@@ -40,10 +41,7 @@ export default config({
           directory: 'public/images/products',
           publicPath: '/images/products/',
         }),
-        description: fields.text({ 
-            label: '简短描述 (列表页显示)',
-            multiline: true 
-        }),
+        description: fields.text({ label: '简短描述', multiline: true }),
         content: fields.document({
           label: '详细介绍',
           formatting: true,
@@ -57,7 +55,7 @@ export default config({
       },
     }),
 
-    // 🎓 第二板块：大山学院 (文章/教程)
+    // 🎓 大山学院
     posts: collection({
       label: '大山学院',
       slugField: 'title',
@@ -65,19 +63,13 @@ export default config({
       format: { contentField: 'content' },
       schema: {
         title: fields.slug({ name: { label: '文章标题' } }),
-        publishedDate: fields.date({ 
-            label: '发布日期',
-            defaultValue: { kind: 'today' } 
-        }),
+        publishedDate: fields.date({ label: '发布日期', defaultValue: { kind: 'today' } }),
         coverImage: fields.image({
           label: '封面图片',
           directory: 'public/images/posts',
           publicPath: '/images/posts/',
         }),
-        excerpt: fields.text({
-            label: '文章摘要 (显示在列表)',
-            multiline: true
-        }),
+        excerpt: fields.text({ label: '文章摘要', multiline: true }),
         content: fields.document({
           label: '文章正文',
           formatting: true,
@@ -92,4 +84,3 @@ export default config({
     }),
   },
 });
-// 🟢 加一行注释：强制触发 Vercel 更新环境变量
