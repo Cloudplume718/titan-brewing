@@ -1,15 +1,14 @@
 import Link from "next/link";
+import Image from "next/image"; // 🟢 引入 Image
 import { MapPin, Phone, Mail, User, Beer } from "lucide-react";
 
 export default function Footer() {
   return (
-    // 🟢 关键修改：在这里添加了 id="contact"
-    // 这样导航栏的 /about#contact 链接就能自动滚动到这里
     <footer id="contact" className="bg-gray-50 text-gray-600 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
           
-          {/* 1. 联系我们 (第一列) */}
+          {/* 1. 联系我们 */}
           <div>
             <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-lg">联系我们</h4>
             <ul className="space-y-5 text-base">
@@ -56,9 +55,16 @@ export default function Footer() {
             </ul>
           </div>
 
-           {/* 4. 关于公司 */}
+           {/* 4. 关于公司 (Logo 也在这里) */}
            <div>
-             <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-lg">关于山之欧瑞堡</h4>
+             <div className="flex items-center gap-2 mb-6">
+                 {/* 🟢 修改：使用 icon.svg */}
+                 <div className="w-8 h-8 relative">
+                    <Image src="/icon.svg" alt="Logo" fill className="object-contain" />
+                 </div>
+                 <span className="font-heading font-bold text-xl text-gray-900">OURUIBAO</span>
+             </div>
+             
              <p className="text-base leading-relaxed text-gray-600 mb-4">
               聊城山之欧瑞堡机械设备有限公司。拥有1000多平仓储运营中心，专注二手精酿设备15年，服务国内外上千家客户。
             </p>
@@ -70,7 +76,7 @@ export default function Footer() {
 
       <div className="bg-gray-100 border-t border-gray-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; 2026 聊城山之欧瑞堡机械设备有限公司. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} 聊城山之欧瑞堡机械设备有限公司. All rights reserved.</p>
           <div className="flex gap-8 mt-4 md:mt-0">
               <span>技术支持: 大山团队</span>
           </div>

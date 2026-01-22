@@ -9,8 +9,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 
 export const metadata: Metadata = {
-  title: "Titan Brewing | 欧瑞堡精酿设备",
-  description: "专业二手精酿啤酒设备交易平台",
+  // 🟢 修改这里
+  title: "欧瑞堡 | 专注二手精酿设备供应链",
+  description: "专业二手精酿啤酒设备交易平台，大山严选，品质保证。",
 };
 
 export default function RootLayout({
