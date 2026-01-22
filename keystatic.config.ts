@@ -1,21 +1,18 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  // 🟢 暴力模式：直接写死 ID，不读环境变量
+  // 🟢 这里只写仓库信息，千万别写 clientId！
   storage: {
     kind: 'github',
     repo: 'Cloudplume718/titan-brewing',
   },
   
-  // 🟢 告诉前端：这就是我的 ID (请确保这里是你现在的 O8OB 那串)
-  clientId: 'Ov23li3ONSUPSyi9O8OB', 
-
   ui: {
     brand: { name: '欧瑞堡后台' },
   },
   
   collections: {
-    // ... (为了节省篇幅，这里保持你原来的 products 和 posts 集合代码不变，请务必保留它们！)
+    // 📦 设备库存 (保持原样)
     products: collection({
       label: '设备库存',
       slugField: 'name',
@@ -55,6 +52,7 @@ export default config({
       },
     }),
 
+    // 🎓 大山学院 (保持原样)
     posts: collection({
       label: '大山学院',
       slugField: 'title',
