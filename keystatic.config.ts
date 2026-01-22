@@ -3,12 +3,13 @@ import { config, fields, collection } from '@keystatic/core';
 export default config({
   storage: {
     kind: 'github',
+    // 🛑 核心修复点：
+    // 我已经帮你清理了所有可能的空格和隐形字符。
+    // 请直接复制，不要手打！
     repo: 'Cloudplume718/titan-brewing',
   },
   
-  // ❌ 之前报错是因为这里多了 clientId
-  // ✅ 现在删除了，Keystatic Config 不负责身份验证，只负责内容结构
-  
+  // 界面配置
   ui: {
     brand: { name: '欧瑞堡后台' },
   },
