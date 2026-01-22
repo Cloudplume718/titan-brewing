@@ -3,15 +3,14 @@ import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { WishlistProvider } from "@/context/WishlistContext";
+import { WishlistProvider } from "@/context/WishlistContext"; // 🟢 1. 引入
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 
 export const metadata: Metadata = {
-  // 🟢 修改点：网站标题和描述
-  title: "山之欧瑞堡 | 专业二手精酿设备供应链",
-  description: "25年资深酿酒师大山严选。主营100升-10吨二手啤酒设备，拥有1000平仓储中心，提供原料供应与技术扶持。",
+  title: "Titan Brewing | 欧瑞堡精酿设备",
+  description: "专业二手精酿啤酒设备交易平台",
 };
 
 export default function RootLayout({
@@ -21,7 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${inter.variable} ${oswald.variable} bg-background text-foreground antialiased`}>
+      <body className={`${inter.variable} ${oswald.variable} font-sans antialiased`}>
+        {/* 🟢 2. 用 Provider 包裹整个应用 */}
         <WishlistProvider>
           <Navbar />
           {children}

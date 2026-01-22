@@ -2,18 +2,17 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-// 定义收藏商品的格式
-interface WishlistItem {
+type Product = {
   id: string;
   name: string;
   price: number;
   image: string;
   category: string;
-}
+};
 
 interface WishlistContextType {
-  items: WishlistItem[];
-  addToWishlist: (item: WishlistItem) => void;
+  items: Product[];
+  addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string) => void;
   isInWishlist: (id: string) => boolean;
 }
@@ -21,34 +20,29 @@ interface WishlistContextType {
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems] = useState<Product[]>([]);
 
-  // 1. 初始化：从浏览器本地加载数据
+  // 初始化时从 LocalStorage 读取
   useEffect(() => {
-    const saved = localStorage.getItem("titan_wishlist");
+    const saved = localStorage.getItem("wishlist");
     if (saved) {
       setItems(JSON.parse(saved));
     }
-    setIsLoaded(true);
   }, []);
 
-  // 2. 监听变化：一旦 items 变了，就自动存入浏览器
+  // 每次变动都保存到 LocalStorage
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("titan_wishlist", JSON.stringify(items));
-    }
-  }, [items, isLoaded]);
+    localStorage.setItem("wishlist", JSON.stringify(items));
+  }, [items]);
 
-  const addToWishlist = (item: WishlistItem) => {
-    setItems((prev) => {
-      if (prev.find((i) => i.id === item.id)) return prev; // 如果有了就不重复加
-      return [...prev, item];
-    });
+  const addToWishlist = (product: Product) => {
+    if (!isInWishlist(product.id)) {
+      setItems([...items, product]);
+    }
   };
 
   const removeFromWishlist = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    setItems(items.filter((item) => item.id !== id));
   };
 
   const isInWishlist = (id: string) => {
@@ -62,7 +56,6 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 导出这个 Hook 供其他组件使用
 export function useWishlist() {
   const context = useContext(WishlistContext);
   if (context === undefined) {

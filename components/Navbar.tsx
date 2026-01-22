@@ -1,198 +1,146 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Heart, ShoppingCart, X, Phone, Menu } from "lucide-react"; // 🟢 引入 Menu
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Search, Heart, Menu, X, Phone } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
-// 注意：如果你还没完全移除 Sanity，下面的 client 引用先保留，等接了 Keystatic 再删
-import { client } from "@/lib/sanity"; 
 
 export default function Navbar() {
-  const { items } = useWishlist();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // 🟢 手机菜单开关
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<any[]>([]);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  
-  
-  const router = useRouter();
   const pathname = usePathname();
-  // 🟢 新增：如果是后台管理页面，直接不渲染导航栏
-  if (pathname && pathname.startsWith('/keystatic')) {
-    return null;
-  }
-  const isHomePage = pathname === "/";
+  const router = useRouter(); // 🟢 用于搜索跳转
+  const { items } = useWishlist(); // 🟢 获取收藏数量
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // 后台页面不显示导航
+  if (pathname && pathname.startsWith('/keystatic')) return null;
 
-  const handleSearch = async (term: string) => {
-    setSearchTerm(term);
-    if (term.trim().length > 0) {
-      // 暂时保留 Sanity 查询，后续换成 Fuse.js
-      const query = `*[_type == "product" && name match $term + "*"]{_id, name, price, image, category}`;
-      const data = await client.fetch(query, { term });
-      setResults(data);
-    } else {
-      setResults([]);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      // 🟢 跳转到商店页面并带上查询参数
+      router.push(`/shop?search=${encodeURIComponent(searchValue)}`);
+      setIsMenuOpen(false); // 手机端搜索后关闭菜单
     }
   };
 
-  // 🟢 逻辑更新：手机菜单打开时，背景也必须变白，否则字看不清
-  const isWhiteState = !isHomePage || isScrolled || isHovered || isSearchOpen || isMobileMenuOpen;
-  const textColorClass = isWhiteState ? "text-gray-900" : "text-white";
-
   return (
-    <header 
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${
-        isWhiteState 
-          ? "bg-white shadow-md py-2" 
-          : "bg-transparent py-4"
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      
-      {/* 顶栏 (仅在白底或手机菜单打开时显示浅灰背景) */}
-      <div className={`hidden md:block transition-colors duration-500 border-b ${
-          isWhiteState ? "bg-gray-50 border-gray-100 text-gray-500" : "bg-transparent border-white/10 text-white/80"
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-[11px] py-1.5 font-medium tracking-wide">
-          <p>真诚做人，踏实做事 —— 选择大山靠谱！</p>
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
-              <Phone className="w-3 h-3" /> 134-7570-8779 (大山)
-            </span>
-            <Link href="/about" className="hover:text-primary transition-colors">联系我们</Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+    <nav className="fixed w-full bg-white/95 backdrop-blur-md z-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex justify-between items-center h-20">
           
-          {/* Logo */}
-          <div className="flex-shrink-0 w-48 z-50"> {/* z-50 保证 Logo 在菜单之上 */}
-            <Link href="/" className="group flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
-              <img src="/icon.svg" alt="山之欧瑞堡 Logo" className="w-12 h-12 object-contain -mt-1" />
-              <div>
-                  <h1 className={`font-heading text-xl md:text-2xl font-bold tracking-tighter uppercase transition-colors duration-300 ${textColorClass}`}>
-                    山之欧瑞堡
-                  </h1>
-                  <p className={`text-[9px] tracking-widest uppercase hidden md:block ${isWhiteState ? "text-gray-500" : "text-gray-400"}`}>Ouruibao Machinery</p>
-              </div>
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-black text-white flex items-center justify-center font-heading font-bold text-xl rounded-sm">
+              O
+            </div>
+            <div className="flex flex-col">
+              <span className="font-heading font-bold text-xl leading-none text-black">OURUIBAO</span>
+              <span className="text-[10px] tracking-[0.2em] text-gray-500 uppercase">Titan Brewing</span>
+            </div>
+          </Link>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-8 font-bold text-sm uppercase tracking-wider text-gray-600">
+            <Link href="/" className="hover:text-primary transition-colors">首页</Link>
+            <Link href="/shop" className="hover:text-primary transition-colors">设备库存</Link>
+            <Link href="/about" className="hover:text-primary transition-colors">关于大山</Link>
+            {/* 🟢 修改联系大山跳转 */}
+            <Link href="/about#contact" className="hover:text-primary transition-colors">联系我们</Link>
+          </div>
+
+          {/* Icons Area */}
+          <div className="hidden md:flex items-center gap-6">
+            {/* 🟢 搜索框 */}
+            <form onSubmit={handleSearch} className="relative group">
+              <input 
+                type="text" 
+                placeholder="搜索设备..." 
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="pl-3 pr-8 py-1 border-b border-gray-300 focus:border-primary outline-none text-sm w-32 focus:w-48 transition-all bg-transparent"
+              />
+              <button type="submit" className="absolute right-0 top-1 text-gray-400 hover:text-primary">
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* 🟢 收藏夹图标 */}
+            <div className="relative group">
+                <Heart className="w-6 h-6 text-gray-800 group-hover:text-primary cursor-pointer transition-colors" />
+                {items.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                    {items.length}
+                  </span>
+                )}
+                {/* 简单的悬浮提示，也可以点击跳转到专门的收藏页 */}
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white shadow-xl border border-gray-100 p-4 rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                    <p className="text-sm font-bold mb-2">已收藏 {items.length} 件设备</p>
+                    {items.length === 0 ? (
+                        <p className="text-xs text-gray-400">暂无收藏</p>
+                    ) : (
+                        <div className="max-h-48 overflow-y-auto">
+                            {items.map(item => (
+                                <div key={item.id} className="flex gap-2 mb-2 text-xs border-b border-gray-50 pb-2">
+                                    <div className="w-8 h-8 bg-gray-100 relative shrink-0"><img src={item.image} className="w-full h-full object-cover"/></div>
+                                    <div className="overflow-hidden">
+                                        <p className="truncate font-bold">{item.name}</p>
+                                        <p className="text-primary">¥{item.price}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <Link href="/about#contact" className="bg-primary hover:bg-red-700 text-white px-5 py-2 rounded-sm font-bold text-sm uppercase transition-colors shadow-lg shadow-red-500/30">
+              联系大山
             </Link>
           </div>
 
-          {/* 🟢 桌面端导航 (手机隐藏) */}
-          <nav className="hidden md:flex flex-1 justify-center items-center gap-16">
-            {[
-              { name: "首页", href: "/" },
-              { name: "设备展厅", href: "/shop" },
-              { name: "大山学院", href: "/learn" },
-              { name: "关于大山", href: "/about" },
-            ].map((link) => (
-              <Link 
-                key={link.name} 
-                href={link.href} 
-                className={`text-[15px] font-bold transition-all duration-300 relative group ${textColorClass}`}
-              >
-                {link.name}
-                <span className={`absolute -bottom-2 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full group-hover:left-0`} />
-              </Link>
-            ))}
-          </nav>
-
-          {/* 右侧图标区 */}
-          <div className={`flex items-center justify-end gap-5 md:gap-6 w-auto md:w-48 ${textColorClass}`}>
-            <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="hover:text-primary transition-colors">
-              <Search className="w-5 h-5" />
-            </button>
-
-            <Link href="/wishlist" className="relative hover:text-primary transition-colors">
-              <Heart className="w-5 h-5" />
-              {items.length > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                  {items.length}
-                </span>
-              )}
-            </Link>
-
-            {/* 桌面端大按钮 */}
-            <Link href="/about" className="hidden lg:flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-sm hover:bg-red-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 whitespace-nowrap">
-                <Phone className="w-4 h-4" />
-                <span className="text-xs font-bold">联系大山</span>
-            </Link>
-
-            {/* 🟢 手机端汉堡菜单按钮 (仅手机显示) */}
-            <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-1 focus:outline-none z-50"
-            >
-                {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-            </button>
-          </div>
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-gray-900"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
-      {/* 🟢 手机端全屏菜单 (动画滑出) */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-white z-40 pt-24 px-6 animate-in slide-in-from-top-10 fade-in duration-200">
-            <nav className="flex flex-col gap-6 text-xl font-heading font-bold text-gray-900 border-t border-gray-100 pt-8">
-                {[
-                  { name: "首页 Home", href: "/" },
-                  { name: "设备展厅 Shop", href: "/shop" },
-                  { name: "大山学院 Learn", href: "/learn" },
-                  { name: "关于大山 About", href: "/about" },
-                ].map((link) => (
-                  <Link 
-                    key={link.name} 
-                    href={link.href} 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex justify-between items-center border-b border-gray-100 pb-4 active:text-primary"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                
-                <Link 
-                    href="/about" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="mt-4 bg-primary text-white text-center py-4 rounded-sm shadow-lg active:scale-95 transition-transform"
-                >
-                    <Phone className="w-5 h-5 inline-block mr-2" />
-                    拨打大山电话 (134...)
-                </Link>
-            </nav>
-        </div>
-      )}
-
-      {/* 搜索下拉 (保持不变) */}
-      {isSearchOpen && (
-        <div className="absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-primary shadow-2xl p-6 animate-in slide-in-from-top-2 z-40">
-            <div className="max-w-3xl mx-auto relative">
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 h-screen animate-in slide-in-from-top-5">
+          <div className="p-4 space-y-4">
+             {/* 🟢 手机端搜索 */}
+             <form onSubmit={handleSearch} className="relative mb-6">
                 <input 
                     type="text" 
-                    autoFocus
-                    placeholder="请输入设备名称..." 
-                    className="w-full border-b-2 border-gray-200 focus:border-primary bg-transparent pl-2 pr-12 py-3 outline-none text-gray-900 text-xl font-heading"
-                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder="搜索设备..." 
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="w-full bg-gray-50 px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary"
                 />
-                <button onClick={() => setIsSearchOpen(false)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary">
-                    <X className="w-6 h-6" />
-                </button>
-                {/* 搜索结果显示区域 (保持之前的逻辑) */}
+                <button type="submit" className="absolute right-4 top-3 text-gray-400"><Search className="w-5 h-5" /></button>
+             </form>
+
+            <Link href="/" className="block py-2 text-lg font-bold border-b border-gray-50" onClick={() => setIsMenuOpen(false)}>首页</Link>
+            <Link href="/shop" className="block py-2 text-lg font-bold border-b border-gray-50" onClick={() => setIsMenuOpen(false)}>设备库存</Link>
+            <Link href="/about" className="block py-2 text-lg font-bold border-b border-gray-50" onClick={() => setIsMenuOpen(false)}>关于大山</Link>
+            
+            <div className="pt-4 flex items-center justify-between">
+                <span className="font-bold">我的收藏 ({items.length})</span>
+                <Heart className="w-6 h-6 text-primary" />
             </div>
+
+            <Link href="/about#contact" onClick={() => setIsMenuOpen(false)} className="mt-8 block w-full bg-primary text-white text-center py-4 rounded-sm font-bold uppercase">
+              联系大山
+            </Link>
+          </div>
         </div>
       )}
-    </header>
+    </nav>
   );
 }

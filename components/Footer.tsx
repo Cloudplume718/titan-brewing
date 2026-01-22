@@ -3,11 +3,13 @@ import { MapPin, Phone, Mail, User, Beer } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 text-gray-600 border-t border-gray-200">
+    // 🟢 关键修改：在这里添加了 id="contact"
+    // 这样导航栏的 /about#contact 链接就能自动滚动到这里
+    <footer id="contact" className="bg-gray-50 text-gray-600 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
           
-          {/* 1. 联系我们 */}
+          {/* 1. 联系我们 (第一列) */}
           <div>
             <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-lg">联系我们</h4>
             <ul className="space-y-5 text-base">
@@ -32,7 +34,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 2. 主营业务 (根据你的描述修改) */}
+          {/* 2. 主营业务 */}
           <div>
             <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-lg">主营业务</h4>
             <ul className="space-y-5 text-base">
@@ -43,7 +45,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* 3. 适用场景 (新增板块) */}
+          {/* 3. 适用场景 */}
           <div>
             <h4 className="font-bold text-gray-900 mb-6 uppercase tracking-wider text-lg">适用场景</h4>
             <ul className="space-y-5 text-base">
@@ -70,7 +72,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>&copy; 2026 聊城山之欧瑞堡机械设备有限公司. All rights reserved.</p>
           <div className="flex gap-8 mt-4 md:mt-0">
-             <span>技术支持: 大山团队</span>
+              <span>技术支持: 大山团队</span>
           </div>
         </div>
       </div>

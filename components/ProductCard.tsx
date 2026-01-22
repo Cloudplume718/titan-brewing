@@ -1,18 +1,35 @@
+"use client"; // 🟢 必须转为 Client Component 才能交互
+
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductProps {
   data: {
     id: string;
     name: string;
-    price: number; // 这里接收 0 或者具体金额
+    price: number;
     image: string;
     category: string;
   };
 }
 
 export default function ProductCard({ data }: ProductProps) {
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const isLiked = isInWishlist(data.id);
+
+  // 🟢 点击爱心时的处理
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault(); // 阻止跳转到详情页
+    e.stopPropagation();
+    if (isLiked) {
+      removeFromWishlist(data.id);
+    } else {
+      addToWishlist(data);
+    }
+  };
+
   return (
     <Link href={`/shop/${data.id}`} className="group block bg-white border border-gray-200 hover:border-primary/50 hover:shadow-xl transition-all duration-300 rounded-sm overflow-hidden flex flex-col h-full">
       {/* 图片区 */}
@@ -42,14 +59,19 @@ export default function ProductCard({ data }: ProductProps) {
         </h3>
         
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
-            {/* 🟢 核心修改：价格显示逻辑 */}
             <span className={`font-bold text-xl ${data.price > 0 ? "text-primary" : "text-green-600"}`}>
                 {data.price > 0 ? `¥ ${data.price.toLocaleString()}` : "面议"}
             </span>
             
-            <span className="bg-gray-100 text-gray-600 p-2 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
-                <ShoppingCart className="w-4 h-4" />
-            </span>
+            {/* 🟢 收藏按钮：点击变色 */}
+            <button 
+                onClick={handleLike}
+                className={`p-2 rounded-full transition-colors z-20 ${
+                    isLiked ? "bg-red-50 text-red-500" : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                }`}
+            >
+                <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+            </button>
         </div>
       </div>
     </Link>
