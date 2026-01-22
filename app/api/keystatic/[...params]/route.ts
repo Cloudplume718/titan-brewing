@@ -3,7 +3,7 @@ import config from '../../../../keystatic.config';
 
 // 👇 1. 定义你的凭证 (请再次确认这里粘贴的是正确的)
 const myClientId = 'Ov23li3ONSUPSyi9O8OB';
-const myClientSecret = '89c582c0d256d2771001cf63e8f5cc0041fc5dfa'; 
+const myClientSecret = 'de2493be82eb06f408caeb5dd6d262625d334d3e'; 
 
 // 👇 2. 打印日志 (这是为了在 Vercel Logs 里看到真相)
 console.log('--- Keystatic Debug ---');
