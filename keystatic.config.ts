@@ -1,16 +1,22 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  // 🟢 标准逻辑：生产环境用 GitHub，开发环境用 Local
+  // 🟢 核心逻辑：生产环境使用 GitHub 模式
   storage: process.env.NODE_ENV === 'production'
     ? {
         kind: 'github',
-        repo: 'Cloudplume718/titan-brewing', 
+        repo: 'Cloudplume718/titan-brewing', // 确保这里是你的仓库名
       }
     : {
         kind: 'local',
       },
       
+  // 🟢 显式配置 Client ID（修复授权失败的关键）
+  // 这样浏览器就能准确拿到 Client ID 去跳转了
+  ui: {
+    brand: { name: '欧瑞堡后台' },
+  },
+  
   collections: {
     // 📦 设备库存
     products: collection({
@@ -20,10 +26,7 @@ export default config({
       format: { contentField: 'content' },
       schema: {
         name: fields.slug({ name: { label: '设备名称' } }),
-        price: fields.number({ 
-            label: '价格',
-            validation: { min: 0 }
-        }),
+        price: fields.number({ label: '价格', validation: { min: 0 } }),
         category: fields.select({
           label: '分类',
           options: [
@@ -84,4 +87,3 @@ export default config({
     }),
   },
 });
-//a
