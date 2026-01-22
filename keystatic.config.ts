@@ -1,3 +1,5 @@
+
+const NOT_SECRET_ID = 'Ov23li3ONSUPSyi9O8OB'; // 填你现在的 ID
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
