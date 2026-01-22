@@ -1,18 +1,17 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  // 🟢 核心逻辑：生产环境使用 GitHub 模式
+  // 🟢 标准配置：生产环境用 GitHub，开发环境用 Local
   storage: process.env.NODE_ENV === 'production'
     ? {
         kind: 'github',
-        repo: 'Cloudplume718/titan-brewing', // 确保这里是你的仓库名
+        repo: 'Cloudplume718/titan-brewing', 
       }
     : {
         kind: 'local',
       },
       
-  // 🟢 显式配置 Client ID（修复授权失败的关键）
-  // 这样浏览器就能准确拿到 Client ID 去跳转了
+  // 🟢 这一行非常重要：告诉 Keystatic 前台显示的名称
   ui: {
     brand: { name: '欧瑞堡后台' },
   },
@@ -87,3 +86,4 @@ export default config({
     }),
   },
 });
+//c
