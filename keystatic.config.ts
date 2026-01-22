@@ -92,3 +92,4 @@ export default config({
     }),
   },
 });
+// 🟢 加一行注释：强制触发 Vercel 更新环境变量
