@@ -11,6 +11,7 @@
   "dependencies": {
     "@keystatic/core": "^0.5.48",
     "@keystatic/next": "^5.0.4",
+    "@larksuiteoapi/node-sdk": "^1.56.1",
     "@portabletext/react": "^6.0.2",
     "@sanity/image-url": "^2.0.3",
     "lucide-react": "^0.562.0",

@@ -1,102 +1,89 @@
-import { reader } from '@/lib/reader';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft, Phone, ShieldCheck, Truck } from 'lucide-react';
-import WishlistButton from '@/components/WishlistButton'; // 🟢 引入收藏按钮
+import Link from "next/link";
+import { ArrowLeft, CheckCircle, Phone } from "lucide-react";
+import { getProduct } from "@/lib/feishu";
+import { notFound } from "next/navigation";
 
-export async function generateStaticParams() {
-  const slugs = await reader.collections.products.list();
-  return slugs.map((slug) => ({ slug }));
-}
+export const dynamic = 'force-dynamic';
 
-export default async function ProductPage(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
-  const slug = params.slug;
-  const product = await reader.collections.products.read(slug);
+export default async function ProductPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const resolvedParams = await params;
+  const productId = resolvedParams.slug; 
 
-  if (!product) notFound();
+  const product = await getProduct(productId); 
+
+  if (!product) {
+    return notFound();
+  }
 
   return (
-    <main className="min-h-screen bg-white pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-4">
-        
+    // 🟢 修复点：添加 pt-24 防止顶部导航栏遮挡
+    <main className="min-h-screen bg-gray-50 pt-24 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* 顶部导航 */}
         <Link href="/shop" className="inline-flex items-center text-gray-500 hover:text-primary mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" /> 返回设备列表
+          <ArrowLeft className="w-4 h-4 mr-2" /> 返回列表
         </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-          
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 grid grid-cols-1 md:grid-cols-2">
           {/* 左侧：图片 */}
-          <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-100 relative aspect-square md:aspect-[4/3]">
-             {product.image ? (
-                <Image 
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-contain p-4 mix-blend-multiply"
-                  priority
+          <div className="bg-gray-100 h-96 md:h-auto relative">
+             {product.imageUrl ? (
+                <img 
+                  src={product.imageUrl} 
+                  alt={product.name} 
+                  className="w-full h-full object-cover"
                 />
              ) : (
-                <div className="flex items-center justify-center h-full text-gray-300 font-bold">暂无图片</div>
+                <div className="flex items-center justify-center h-full text-gray-400">暂无图片</div>
              )}
           </div>
 
           {/* 右侧：信息 */}
-          <div>
-            <div className="mb-2 text-primary font-bold uppercase tracking-wider text-sm">
+          <div className="p-8 md:p-12 flex flex-col">
+            <div className="mb-auto">
+              <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                 {product.category}
-            </div>
-            <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+              </span>
+              <h1 className="mt-4 text-3xl font-bold text-gray-900 leading-tight">
                 {product.name}
-            </h1>
-            
-            <div className="text-3xl font-bold text-red-600 mb-8 border-b border-gray-100 pb-8">
-               {product.price && product.price > 0 
-                  ? `¥ ${product.price.toLocaleString()}` 
-                  : <span className="text-green-600">价格面议</span>
-               }
-            </div>
-
-            <div className="prose prose-lg text-gray-600 mb-8">
-                <h3 className="text-black font-bold text-lg mb-2">设备详情：</h3>
-                <p className="whitespace-pre-line leading-relaxed">
-                    {product.description || "暂无详细描述，请联系大山咨询更多细节。"}
+              </h1>
+              <p className="mt-4 text-4xl font-bold text-red-600">
+                 {isNaN(Number(product.price)) || Number(product.price) === 0 
+                    ? "面议" 
+                    : `¥ ${product.price}`}
+              </p>
+              
+              <div className="mt-8 prose prose-gray text-gray-500">
+                <h3 className="text-black font-bold text-lg mb-2">设备详情</h3>
+                <p className="whitespace-pre-wrap leading-relaxed">
+                  {product.desc || "暂无详细描述，请联系客服咨询。"}
                 </p>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3">
+                <div className="flex items-center text-sm text-green-600">
+                    <CheckCircle className="w-4 h-4 mr-2" /> 经过大山团队 26 项严格检测
+                </div>
+                <div className="flex items-center text-sm text-green-600">
+                    <CheckCircle className="w-4 h-4 mr-2" /> 提供安装调试与酿造指导
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <ShieldCheck className="w-5 h-5 text-green-500" /> 25年经验鉴定
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Truck className="w-5 h-5 text-blue-500" /> 物流破损包赔
-                </div>
-            </div>
-
-            {/* 🟢 按钮区域 */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                {/* 1. 联系大山按钮：跳转到 #contact */}
-                <Link 
-                    href="/about#contact" 
-                    className="flex-[2] bg-primary hover:bg-red-700 text-white text-center font-bold py-4 rounded-sm transition-colors shadow-lg shadow-red-500/30 flex items-center justify-center"
-                >
-                    <Phone className="w-5 h-5 mr-2" />
-                    联系大山 (134-7570-8779)
+            {/* 底部按钮 */}
+            <div className="mt-10 pt-8 border-t border-gray-100">
+              <p className="text-sm text-gray-400 mb-3">有意购买此设备？</p>
+              <div className="flex gap-4">
+                {/* 🟢 修复点：链接跳转到 about 页面的底部 #contact */}
+                <Link href="/about#contact" className="flex-1 bg-primary text-white text-center font-bold py-3 rounded-md hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
+                  <Phone className="w-4 h-4" /> 联系大山咨询
                 </Link>
-
-                {/* 2. 收藏按钮：使用新组件 */}
-                <WishlistButton 
-                    product={{
-                        id: slug,
-                        name: product.name,
-                        price: product.price ?? 0,
-                        image: product.image || '',
-                        category: product.category
-                    }}
-                />
+              </div>
             </div>
-
           </div>
         </div>
       </div>

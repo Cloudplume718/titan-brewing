@@ -59,9 +59,9 @@ export default function ProductCard({ data }: ProductProps) {
         </h3>
         
         <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
-            <span className={`font-bold text-xl ${data.price > 0 ? "text-primary" : "text-green-600"}`}>
-                {data.price > 0 ? `¥ ${data.price.toLocaleString()}` : "面议"}
-            </span>
+          <p className="text-red-600 font-bold">
+            {data.price === 0 ? '面议' : `¥ ${data.price}`}
+          </p>
             
             {/* 🟢 收藏按钮：点击变色 */}
             <button 

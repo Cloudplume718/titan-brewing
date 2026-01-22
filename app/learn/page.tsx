@@ -1,71 +1,75 @@
-import { client, urlFor } from "@/lib/sanity";
-import { BookOpen, FlaskConical, PlayCircle, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import Link from 'next/link';
+import { getPosts } from '@/lib/feishu';
+import { ArrowLeft, Calendar, ExternalLink } from 'lucide-react';
 
-const query = `*[_type == "guide"] | order(_createdAt desc)`;
-
-const getIcon = (category: string) => {
-  if (category === '经典配方') return <FlaskConical className="w-10 h-10 text-primary mb-4" />;
-  if (category === '视频教程') return <PlayCircle className="w-10 h-10 text-primary mb-4" />;
-  return <BookOpen className="w-10 h-10 text-primary mb-4" />;
-};
+export const dynamic = 'force-dynamic';
 
 export default async function LearnPage() {
-  const guides = await client.fetch(query);
+  const posts = await getPosts();
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 py-16 pt-40">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* 头部 */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-            <h1 className="font-heading text-5xl font-bold uppercase mb-4 text-black">酿造学院</h1>
-            <p className="text-gray-500 text-lg">知识就是力量，更是好酒的源泉。<br/>从入门技巧到大师配方，这里应有尽有。</p>
+    <main className="min-h-screen bg-gray-50 pt-24 pb-12">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* 顶部导航 */}
+        <div className="mb-8">
+          <Link href="/" className="inline-flex items-center text-gray-500 hover:text-primary transition-colors mb-4">
+            <ArrowLeft className="w-4 h-4 mr-2" /> 返回首页
+          </Link>
+          <h1 className="text-3xl font-heading font-bold text-gray-900">大山酿造学院</h1>
+          <p className="text-gray-500 mt-2">分享酿造技术、开店经验与避坑指南</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {guides.length > 0 ? (
-            guides.map((guide: any) => {
-                if (!guide.slug || !guide.slug.current) return null;
-                return (
-                  <Link 
-                    href={`/learn/${guide.slug.current}`}
-                    key={guide._id} 
-                    className="bg-white border border-gray-200 hover:border-primary hover:shadow-xl transition-all duration-300 group block rounded-sm overflow-hidden flex flex-col h-full"
-                  >
-                    {/* 封面图 */}
-                    <div className="h-56 overflow-hidden bg-gray-100 relative">
-                        {guide.mainImage ? (
-                             <img src={urlFor(guide.mainImage).url()} alt={guide.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                        ) : (
-                             <div className="flex items-center justify-center h-full bg-gray-50">{getIcon(guide.category)}</div>
-                        )}
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold uppercase text-black rounded-sm shadow-sm">
-                            {guide.category}
-                        </div>
+        {/* 文章列表 */}
+        <div className="grid gap-6">
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <a 
+                key={post.id} 
+                href={post.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100"
+              >
+                <div className="flex flex-col md:flex-row h-full">
+                  {/* 封面图 */}
+                  <div className="w-full md:w-64 h-48 md:h-auto bg-gray-200 shrink-0 relative overflow-hidden">
+                    {post.coverUrl ? (
+                      <img 
+                        src={post.coverUrl} 
+                        alt={post.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">暂无封面</div>
+                    )}
+                  </div>
+                  
+                  {/* 内容区 */}
+                  <div className="p-6 flex flex-col justify-center flex-1">
+                    <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
+                      <span className="flex items-center"><Calendar className="w-4 h-4 mr-1"/> {post.date}</span>
+                      <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    
-                    {/* 内容 */}
-                    <div className="p-8 flex flex-col flex-1">
-                        <h3 className="font-heading text-2xl font-bold uppercase mb-3 text-black group-hover:text-primary transition-colors line-clamp-2">
-                            {guide.title}
-                        </h3>
-                        <p className="text-gray-500 mb-6 line-clamp-3 text-sm leading-relaxed">
-                            {guide.excerpt}
-                        </p>
-                        
-                        <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between text-sm">
-                            <span className="text-gray-400 font-medium">阅读详情</span>
-                            <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
-                        </div>
-                    </div>
-                  </Link>
-                )
-            })
+                    <h2 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary transition-colors">
+                      {post.title}
+                    </h2>
+                    <p className="text-gray-600 line-clamp-2 text-sm leading-relaxed">
+                      {post.desc || '暂无简介'}
+                    </p>
+                    <span className="mt-4 text-primary text-sm font-bold inline-block opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                      阅读全文 →
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))
           ) : (
-            <p className="text-center col-span-full text-gray-500">暂无教程，请去后台发布。</p>
+            <div className="text-center py-20 bg-white rounded-lg border border-dashed border-gray-300">
+              <p className="text-gray-400">暂无文章，大山正在整理中...</p>
+            </div>
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
