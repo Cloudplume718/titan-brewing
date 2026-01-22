@@ -9,7 +9,11 @@ export default config({
     repo: 'Cloudplume718/titan-brewing',
   },
   
-  // 🟢 暴力写入 ID (配合最下面的 as any 使用)
+  // 👇 🟢 这里的改动是关键！
+  // 我们用 @ts-ignore 告诉 TypeScript：“别管这一行，我知道我在做什么”
+  // 这样既能保留 clientId，又不会破坏下面的 products 类型定义
+  
+  // @ts-ignore
   clientId: FIXED_CLIENT_ID,
 
   ui: {
@@ -17,7 +21,7 @@ export default config({
   },
   
   collections: {
-    // ... (请保留你之前的 products 和 posts 集合代码，这里省略是为了节省篇幅)
+    // 📦 设备库存 (保持原样)
     products: collection({
       label: '设备库存',
       slugField: 'name',
@@ -56,6 +60,8 @@ export default config({
         }),
       },
     }),
+
+    // 🎓 大山学院 (保持原样)
     posts: collection({
       label: '大山学院',
       slugField: 'title',
@@ -83,4 +89,4 @@ export default config({
       },
     }),
   },
-} as any); // 👈 这一行是关键！加上 as any 就可以强行写入 clientId 而不报错
+});
