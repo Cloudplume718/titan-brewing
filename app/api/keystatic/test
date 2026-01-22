@@ -1,0 +1,16 @@
+// app/api/keystatic/test/route.ts
+
+/**
+ * 🧪 测试路由
+ * 访问：https://titan-brewing.vercel.app/api/keystatic/test
+ * 用于验证路由是否正常工作
+ */
+
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({
+    message: '✅ Keystatic 路由正常工作！',
+    timestamp: new Date().toISOString(),
+  });
+}
