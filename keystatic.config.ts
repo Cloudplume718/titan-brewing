@@ -1,27 +1,20 @@
 import { config, fields, collection } from '@keystatic/core';
 
-// 👇 必须和后端填的一模一样！
-const FIXED_CLIENT_ID = 'Ov23li3ONSUPSyi9O8OB'; 
-
 export default config({
   storage: {
     kind: 'github',
     repo: 'Cloudplume718/titan-brewing',
   },
   
-  // 👇 🟢 这里的改动是关键！
-  // 我们用 @ts-ignore 告诉 TypeScript：“别管这一行，我知道我在做什么”
-  // 这样既能保留 clientId，又不会破坏下面的 products 类型定义
+  // ❌ 之前报错是因为这里多了 clientId
+  // ✅ 现在删除了，Keystatic Config 不负责身份验证，只负责内容结构
   
-  // @ts-ignore
-  clientId: FIXED_CLIENT_ID,
-
   ui: {
     brand: { name: '欧瑞堡后台' },
   },
   
   collections: {
-    // 📦 设备库存 (保持原样)
+    // 📦 设备库存
     products: collection({
       label: '设备库存',
       slugField: 'name',
@@ -61,7 +54,7 @@ export default config({
       },
     }),
 
-    // 🎓 大山学院 (保持原样)
+    // 🎓 大山学院
     posts: collection({
       label: '大山学院',
       slugField: 'title',
