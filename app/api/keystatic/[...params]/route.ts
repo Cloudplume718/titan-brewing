@@ -4,7 +4,7 @@ import config from '../../../../keystatic.config';
 
 // 🔴 必填：请填入你最新的 ID 和 新密码
 const CLIENT_ID = 'Ov23li3ONSUPSyi9O8OB';
-const CLIENT_SECRET = '你的新密码填在这里'; 
+const CLIENT_SECRET = 'de2493be82eb06f408caeb5dd6d262625d334d3e'; 
 
 // 初始化 Keystatic
 const { GET: keystaticGet, POST: keystaticPost } = makeRouteHandler({
