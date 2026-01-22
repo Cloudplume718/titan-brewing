@@ -1,72 +1,91 @@
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
-  // 🟢 智能存储模式：本地开发用 local，上线后用 github
-storage: { kind: 'local' },
-
-  // ☁️ 云端配置 (保持不变)
-  cloud: {
-    project: 'dashan-website',
-  },
-
+  // 🟢 智能模式：本地开发用 local，线上用 github
+  storage: process.env.NODE_ENV === 'development'
+    ? { kind: 'local' }
+    : {
+        kind: 'github',
+        // 🔴 务必确认这里是你的 "用户名/仓库名"
+        repo: 'Cloudplume718/titan-brewing', 
+      },
+      
   collections: {
-    // 1. 📦 设备库存管理
+    // 📦 第一板块：设备库存
     products: collection({
       label: '设备库存',
       slugField: 'name',
       path: 'content/products/*',
-      format: { data: 'json' },
+      format: { contentField: 'content' },
       schema: {
         name: fields.slug({ name: { label: '设备名称' } }),
         price: fields.number({ 
-            label: '价格 (元)',
-            validation: { min: 0 },
-            description: '输入数字即可，前台会自动加 ¥ 符号'
+            label: '价格 (填0或空则显示面议)',
+            validation: { min: 0 }
         }),
         category: fields.select({
-          label: '设备分类',
+          label: '分类',
           options: [
             { label: '发酵罐', value: '发酵罐' },
-            { label: '糖化锅', value: '糖化锅' },
-            { label: '整套系统', value: '整套系统' },
-            { label: '配件/原料', value: '配件' },
+            { label: '糖化设备', value: '糖化设备' },
+            { label: '制冷系统', value: '制冷系统' },
+            { label: '包装/灌装', value: '包装设备' },
+            { label: '整店打包', value: '整店打包' },
+            { label: '其他配件', value: '其他' },
           ],
           defaultValue: '发酵罐',
         }),
         image: fields.image({
-          label: '设备实拍图',
+          label: '设备图片',
           directory: 'public/images/products',
           publicPath: '/images/products/',
         }),
         description: fields.text({ 
-            label: '设备描述', 
+            label: '简短描述 (列表页显示)',
             multiline: true 
         }),
-      },
-    }),
-
-    // 2. 🎓 大山学院文章
-    guides: collection({
-      label: '大山学院',
-      slugField: 'title',
-      path: 'content/guides/*',
-      format: { contentField: 'content' },
-      schema: {
-        title: fields.slug({ name: { label: '文章标题' } }),
-        publishedDate: fields.date({ label: '发布日期' }),
-        coverImage: fields.image({
-            label: '封面图',
-            directory: 'public/images/guides',
-            publicPath: '/images/guides/',
-        }),
         content: fields.document({
-          label: '正文内容',
+          label: '详细介绍',
           formatting: true,
           dividers: true,
           links: true,
           images: {
-             directory: 'public/images/guides/content',
-             publicPath: '/images/guides/content/',
+            directory: 'public/images/products',
+            publicPath: '/images/products/',
+          },
+        }),
+      },
+    }),
+
+    // 🎓 第二板块：大山学院 (文章/教程)
+    posts: collection({
+      label: '大山学院',
+      slugField: 'title',
+      path: 'content/posts/*',
+      format: { contentField: 'content' },
+      schema: {
+        title: fields.slug({ name: { label: '文章标题' } }),
+        publishedDate: fields.date({ 
+            label: '发布日期',
+            defaultValue: { kind: 'today' } 
+        }),
+        coverImage: fields.image({
+          label: '封面图片',
+          directory: 'public/images/posts',
+          publicPath: '/images/posts/',
+        }),
+        excerpt: fields.text({
+            label: '文章摘要 (显示在列表)',
+            multiline: true
+        }),
+        content: fields.document({
+          label: '文章正文',
+          formatting: true,
+          dividers: true,
+          links: true,
+          images: {
+            directory: 'public/images/posts',
+            publicPath: '/images/posts/',
           },
         }),
       },
