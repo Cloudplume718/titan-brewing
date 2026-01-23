@@ -1,10 +1,11 @@
-import ProductCard from "@/components/ProductCard";
 import HeroCarousel from "@/components/HeroCarousel";
+import ProductCard from "@/components/ProductCard";
 import VideoModal from "@/components/VideoModal"; 
 import { ArrowRight, Warehouse, History, Handshake } from "lucide-react";
 import Link from "next/link";
 // 🟢 引入飞书接口
 import { getProducts } from "@/lib/feishu";
+
 
 // 1. 定义轮播图数据 (保持原样)
 const heroSlides = [
@@ -41,14 +42,18 @@ export default async function Home() {
   // 🟢 2. 只取最新的 4 个显示在首页
   const recentProducts = allProducts.slice(0, 4);
 
+
+
   return (
     <main className="min-h-screen bg-white text-gray-900">
+        
+        {/* 1. 顶部 Hero 区域 (恢复纯净版) */}
+        <div className="relative">
+            <HeroCarousel slides={heroSlides} />
+        </div>
       
-      {/* 1. 顶部轮播图 */}
-      <HeroCarousel slides={heroSlides} />
-
       {/* 2. 核心实力展示 (完全保留) */}
-      <section className="max-w-7xl mx-auto px-4 my-16">
+      <section className="max-w-7xl mx-auto px-4 my-16 pt-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white border border-gray-100 p-8 rounded-sm shadow-sm hover:shadow-lg transition-shadow flex items-start gap-4">
                 <div className="bg-red-50 p-4 rounded-full text-primary shrink-0"><History className="w-8 h-8" /></div>
@@ -89,9 +94,7 @@ export default async function Home() {
                     data={{
                         id: product.id,
                         name: product.name,
-                        // 🟢 智能价格处理：
-                        // 如果飞书填的是"面议"或非数字，转为0 (组件显示为面议)
-                        // 如果填的是数字，正常显示
+                        // 智能价格处理
                         price: isNaN(Number(product.price)) ? 0 : Number(product.price),
                         category: product.category,
                         image: product.imageUrl || '' 
@@ -111,7 +114,7 @@ export default async function Home() {
       <section className="py-24 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             
-            {/* 🟢 视频组件 */}
+            {/* 视频组件 */}
             <VideoModal />
 
             <div>

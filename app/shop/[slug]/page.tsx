@@ -1,89 +1,136 @@
-import Link from "next/link";
-import { ArrowLeft, CheckCircle, Phone } from "lucide-react";
-import { getProduct } from "@/lib/feishu";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, MessageCircle, CheckCircle, Truck, ShieldCheck } from "lucide-react";
+import { getProduct } from "@/lib/feishu";
+// 🟢 引入收藏按钮组件
+import ProductWishlistButton from "@/components/ProductWishlistButton";
 
+// 强制动态渲染
 export const dynamic = 'force-dynamic';
 
-export default async function ProductPage({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}) {
-  const resolvedParams = await params;
-  const productId = resolvedParams.slug; 
+interface PageProps {
+  // 🟢 因为你的文件夹叫 [slug]，所以这里参数名必须是 slug
+  params: Promise<{ slug: string }>;
+}
 
-  const product = await getProduct(productId); 
+export default async function ProductPage({ params }: PageProps) {
+  // 1. 获取 URL 参数 (Next.js 15+ 需要 await)
+  const { slug } = await params;
+  
+  // 2. 用这个 slug (其实就是商品ID) 去飞书查数据
+  const product = await getProduct(slug);
 
   if (!product) {
-    return notFound();
+    notFound();
   }
 
-  return (
-    // 🟢 修复点：添加 pt-24 防止顶部导航栏遮挡
-    <main className="min-h-screen bg-gray-50 pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* 顶部导航 */}
-        <Link href="/shop" className="inline-flex items-center text-gray-500 hover:text-primary mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" /> 返回列表
-        </Link>
+  // 3. 数据清洗
+  const priceNumber = isNaN(Number(product.price)) ? 0 : Number(product.price);
+  // 🟢 关键修复：给 category 一个默认值，防止飞书没填导致报错
+  const safeCategory = product.category || '精选设备';
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 grid grid-cols-1 md:grid-cols-2">
-          {/* 左侧：图片 */}
-          <div className="bg-gray-100 h-96 md:h-auto relative">
-             {product.imageUrl ? (
-                <img 
-                  src={product.imageUrl} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover"
-                />
-             ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">暂无图片</div>
-             )}
+  return (
+    <main className="min-h-screen bg-gray-50 pt-24 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        {/* 面包屑导航 */}
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+          <Link href="/shop" className="hover:text-primary flex items-center gap-1 transition-colors">
+            <ArrowLeft className="w-4 h-4" /> 返回商城
+          </Link>
+          <span className="text-gray-300">/</span>
+          <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          
+          {/* 左侧：图片展示区 */}
+          <div className="space-y-4">
+            <div className="aspect-square bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm relative group">
+                {product.imageUrl ? (
+                    <img 
+                        src={product.imageUrl} 
+                        alt={product.name} 
+                        className="w-full h-full object-contain p-8 transition-transform duration-500 group-hover:scale-105" 
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
+                        暂无图片
+                    </div>
+                )}
+            </div>
+            
+            {/* 服务承诺 */}
+            <div className="grid grid-cols-3 gap-4">
+                <div className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg border border-gray-100 text-xs text-gray-600">
+                    <CheckCircle className="w-4 h-4 text-primary" /> 专业检测
+                </div>
+                <div className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg border border-gray-100 text-xs text-gray-600">
+                    <Truck className="w-4 h-4 text-primary" /> 全国物流
+                </div>
+                <div className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg border border-gray-100 text-xs text-gray-600">
+                    <ShieldCheck className="w-4 h-4 text-primary" /> 售后保障
+                </div>
+            </div>
           </div>
 
-          {/* 右侧：信息 */}
-          <div className="p-8 md:p-12 flex flex-col">
-            <div className="mb-auto">
-              <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                {product.category}
-              </span>
-              <h1 className="mt-4 text-3xl font-bold text-gray-900 leading-tight">
+          {/* 右侧：信息详情区 */}
+          <div className="flex flex-col h-full">
+            
+            {/* 分类标签 */}
+            <div className="mb-4">
+                <span className="inline-block bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    {safeCategory}
+                </span>
+            </div>
+
+            {/* 标题 */}
+            <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-6 leading-tight">
                 {product.name}
-              </h1>
-              <p className="mt-4 text-4xl font-bold text-red-600">
-                 {isNaN(Number(product.price)) || Number(product.price) === 0 
-                    ? "面议" 
-                    : `¥ ${product.price}`}
-              </p>
-              
-              <div className="mt-8 prose prose-gray text-gray-500">
-                <h3 className="text-black font-bold text-lg mb-2">设备详情</h3>
-                <p className="whitespace-pre-wrap leading-relaxed">
-                  {product.desc || "暂无详细描述，请联系客服咨询。"}
+            </h1>
+
+            {/* 价格 */}
+            <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-gray-100">
+                {priceNumber > 0 ? (
+                    <>
+                        <span className="text-4xl font-bold text-primary">¥{priceNumber.toLocaleString()}</span>
+                        <span className="text-gray-400 text-sm">不含运费</span>
+                    </>
+                ) : (
+                    <span className="text-4xl font-bold text-primary">价格面议</span>
+                )}
+            </div>
+
+            {/* 描述 */}
+            <div className="prose prose-gray max-w-none text-gray-600 mb-10 flex-1">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">设备详情</h3>
+                <p className="whitespace-pre-line leading-relaxed">
+                    {product.desc || "暂无详细描述，请联系客服获取更多信息。"}
                 </p>
-              </div>
-
-              <div className="mt-8 flex flex-col gap-3">
-                <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="w-4 h-4 mr-2" /> 经过大山团队 26 项严格检测
-                </div>
-                <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="w-4 h-4 mr-2" /> 提供安装调试与酿造指导
-                </div>
-              </div>
             </div>
 
-            {/* 底部按钮 */}
-            <div className="mt-10 pt-8 border-t border-gray-100">
-              <p className="text-sm text-gray-400 mb-3">有意购买此设备？</p>
-              <div className="flex gap-4">
-                {/* 🟢 修复点：链接跳转到 about 页面的底部 #contact */}
-                <Link href="/about#contact" className="flex-1 bg-primary text-white text-center font-bold py-3 rounded-md hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
-                  <Phone className="w-4 h-4" /> 联系大山咨询
+            {/* 🟢 底部按钮组 */}
+            <div className="flex gap-4 mt-auto">
+                <Link 
+                    href="/about#contact" 
+                    className="flex-1 bg-primary hover:bg-red-700 text-white font-bold py-4 px-8 rounded-sm transition-all shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 group"
+                >
+                    <MessageCircle className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+                    联系大山购买
                 </Link>
-              </div>
+
+                {/* 🟢 收藏按钮：现在传入了 category，不会再报错了 */}
+                <ProductWishlistButton 
+                    data={{
+                        id: product.id,
+                        name: product.name,
+                        price: priceNumber,
+                        image: product.imageUrl || '',
+                        category: safeCategory // 👈 补全了这个字段
+                    }} 
+                />
             </div>
+
           </div>
         </div>
       </div>

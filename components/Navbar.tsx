@@ -2,26 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Search, Heart, Menu, X, Trash2 } from "lucide-react";
+import { Heart, Menu, X, Trash2 } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
+// 🟢 引入 NavSearch
+import NavSearch from "@/components/NavSearch";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { items, removeFromWishlist } = useWishlist();
   
   // 状态管理
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isHovered, setIsHovered] = useState(false); // 🟢 新增：鼠标悬停状态
+  const [isHovered, setIsHovered] = useState(false); // 鼠标悬停状态
 
-  // 如果是 Keystatic 后台页面，不显示导航栏
+  // Keystatic 后台不显示
   if (pathname && pathname.startsWith('/keystatic')) return null;
 
-  // 监听滚动事件
+  // 监听滚动
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -35,31 +35,33 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 处理搜索
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchValue.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(searchValue)}`);
-      setIsMenuOpen(false);
-    }
-  };
+  // 手机端简单的搜索处理
+  const [mobileSearch, setMobileSearch] = useState("");
+  const handleMobileSearch = (e: React.FormEvent) => {
+      e.preventDefault();
+      if(mobileSearch.trim()){
+          window.location.href = `/shop?q=${mobileSearch}`;
+      }
+  }
 
   // 判断是否是首页
   const isHomePage = pathname === "/";
 
-  // 🟢 核心逻辑：判断导航栏是否应该是实心（白色背景）
-  // 条件：不是首页 OR 页面滚下来了 OR 鼠标放上去了 OR 手机菜单打开了
+  // 核心逻辑：判断导航栏是否应该是实心（白色背景）
   const isSolid = !isHomePage || isScrolled || isHovered || isMenuOpen;
+  
+  // 🟢 计算“透明模式”：只有在首页、且没滚动、没悬停、没开菜单时，才是透明的
+  // 只有这种情况下，搜索框和图标才应该是纯白色
+  const isTransparent = isHomePage && !isScrolled && !isHovered && !isMenuOpen;
 
   return (
     <nav
-      // 🟢 绑定鼠标移入移出事件
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`fixed w-full z-50 transition-all duration-300 border-b ${
         isSolid
-          ? "bg-white/95 backdrop-blur-md border-gray-100 shadow-sm py-0" // 实心状态
-          : "bg-transparent border-transparent py-4" // 透明状态
+          ? "bg-white/95 backdrop-blur-md border-gray-100 shadow-sm py-0" 
+          : "bg-transparent border-transparent py-4" 
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -108,33 +110,15 @@ export default function Navbar() {
           {/* 右侧图标区域 */}
           <div className="hidden md:flex items-center gap-6">
             
-            {/* 搜索框 */}
-            <form onSubmit={handleSearch} className="relative group">
-              <input 
-                type="text" 
-                placeholder="搜索设备..." 
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className={`pl-3 pr-8 py-1 border-b outline-none text-sm w-32 focus:w-48 transition-all bg-transparent ${
-                    isSolid 
-                        ? "border-gray-300 focus:border-primary text-gray-900 placeholder:text-gray-400" 
-                        : "border-white/50 focus:border-white text-white placeholder:text-white/70"
-                }`}
-              />
-              <button 
-                type="submit" 
-                className={`absolute right-0 top-1 hover:text-primary transition-colors ${
-                   isSolid ? "text-gray-400" : "text-white"
-                }`}
-              >
-                <Search className="w-4 h-4" />
-              </button>
-            </form>
+            {/* 🟢 替换原来的 form 为 NavSearch，并传入 isTransparent */}
+            <NavSearch isTransparent={isTransparent} />
 
             {/* 收藏夹图标 */}
             <div className="relative group">
                 <div className="relative cursor-pointer py-2">
                     <Heart 
+                      // 🟢 加粗线条，跟搜索图标匹配
+                      strokeWidth={2.5}
                       className={`w-6 h-6 transition-colors ${
                         items.length > 0 
                             ? "text-primary fill-current" 
@@ -206,12 +190,12 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 h-screen animate-in slide-in-from-top-5">
           <div className="p-4 space-y-4">
-             <form onSubmit={handleSearch} className="relative mb-6">
+             <form onSubmit={handleMobileSearch} className="relative mb-6">
                 <input 
                     type="text" 
                     placeholder="搜索设备..." 
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    value={mobileSearch}
+                    onChange={(e) => setMobileSearch(e.target.value)}
                     className="w-full bg-gray-50 px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary text-black"
                 />
              </form>
