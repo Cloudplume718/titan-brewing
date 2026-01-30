@@ -22,7 +22,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3 text-gray-600">
                 <User className="w-5 h-5 text-primary shrink-0" />
-                <span>联系人：大山 (资深酿酒师)</span>
+                <span>联系人：大山(杨)</span>
               </li>
               <li className="flex items-center gap-3 text-gray-600">
                 <Phone className="w-5 h-5 text-primary shrink-0" />
@@ -33,8 +33,8 @@ export default function Footer() {
               {/* 🟢 新增：邮箱地址 */}
               <li className="flex items-center gap-3 text-gray-600">
                 <Mail className="w-5 h-5 text-primary shrink-0" />
-                <a href="mailto:contact@ouruibao.com" className="hover:text-primary transition-colors">
-                  contact@ouruibao.com
+                <a href="mailto:260538288@qq.com" className="hover:text-primary transition-colors">
+                  260538288@qq.com
                 </a>
               </li>
               <li className="flex items-center gap-3 text-gray-600">
@@ -67,6 +67,12 @@ export default function Footer() {
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
                 <span>设备回收与置换</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                <Link href="/learn" className="hover:text-primary transition-colors">
+                  优质低价灌装机 / 灌桶机
+                </Link>
               </li>
             </ul>
           </div>
@@ -110,7 +116,7 @@ export default function Footer() {
           <div className="flex gap-6">
              <Link href="#" className="hover:text-gray-600">隐私政策</Link>
              <Link href="#" className="hover:text-gray-600">服务条款</Link>
-             <a href="https://beian.miit.gov.cn/" target="_blank" className="hover:text-gray-600">鲁ICP备xxxxxxxx号</a>
+             {/* <a href="https://beian.miit.gov.cn/" target="_blank" className="hover:text-gray-600">鲁ICP备xxxxxxxx号</a> */}
           </div>
         </div>
       </div>

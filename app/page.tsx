@@ -13,7 +13,7 @@ const heroSlides = [
     _id: '1',
     title: '山之欧瑞堡',
     subtitle: '专注二手精酿设备供应链',
-    image: '/images/banner4.jpg',
+    image: '/images/banner1.jpg',
     buttonText: '了解更多'
   },
   {
